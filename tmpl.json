@@ -1,0 +1,103 @@
+{
+	"Parameters": {
+		"KeyName": {
+			"Description": "EC2 key-pair to use",
+			"Type": "AWS::EC2::KeyPair::KeyName"
+		}
+	},
+	"Mappings": {
+		"RegionMap": {
+			"us-east-1": {
+				"AMI": "ami-08f3d892de259504d"
+			},
+			"eu-west-2": {
+				"AMI": "ami-0cf94b1c148cb4b81"
+			},
+			"ap-south-1": {
+				"AMI": "ami-08706cb5f68222d09"
+			}
+		},
+		"VPCIdMap": {
+			"us-east-1": {
+				"ID": "vpc-8d88c8f7"
+			},
+			"eu-west-2": {
+				"ID": "vpc-559ce93d"
+			},
+			"ap-south-1": {
+				"ID": "vpc-f3d3d69b"
+			}
+		}
+	},	
+	"Resources": {
+		"Ec2Instance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"SecurityGroupIds": [
+					{
+						"Fn::GetAtt" : [ "InstanceSecG", "GroupId" ]
+					}
+				],
+				"KeyName": {
+					"Ref": "KeyName"
+				},
+				"BlockDeviceMappings": [
+					{
+						"DeviceName": "/dev/sdm",
+						"Ebs": {
+							"DeleteOnTermination": "false",
+							"VolumeSize": "8"
+						}
+					}
+				],
+				"ImageId": {
+					"Fn::FindInMap": [
+						"RegionMap",
+						{
+							"Ref": "AWS::Region"
+						},
+						"AMI"
+					]
+				},
+				"InstanceType": "t2.micro"
+			}
+		},
+		"InstanceSecG": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Enable HTTP access via port 80  + SSH access",
+				"SecurityGroupIngress": [
+					{"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "CidrIp": "0.0.0.0/0"},
+					{"IpProtocol": "tcp", "FromPort": "22", "ToPort": "80", "CidrIp": "0.0.0.0/0"}
+				],
+				"VpcId": {
+					"Fn::FindInMap": [
+						"VPCIdMap",
+						{
+							"Ref": "AWS::Region"
+						},
+						"ID"
+					]
+				}
+			}
+		}
+	},
+	"Outputs": { 
+		"ID": {
+			"Value": {
+				"Ref": "Ec2Instance"
+			}
+		},
+		"Zone": {
+			"Value": { 
+				"Fn::GetAtt": [ "Ec2Instance", "AvailabilityZone" ]
+			}
+		},
+		"DNS": {
+			"Value": {
+				"Fn::GetAtt": [ "Ec2Instance", "PublicDnsName" ]
+			}
+		}
+	}
+}
+				  
