@@ -34,8 +34,8 @@ def createtmpl(private_key_name, template_url, stack_name='Mystack'):
 #------------------------------------------------------------------------
 #Example function call
 
-createtmpl(
-   private_key_name = 'keytime',
-   template_url = 'https://cf-templates-tqabeo4q9oey-us-east-1.s3.amazonaws.com/20201985qe-tmpl.json'
-)
+#createtmpl(
+#   private_key_name = 'keytime',
+#   template_url = 'https://cf-templates-tqabeo4q9oey-us-east-1.s3.amazonaws.com/20201985qe-tmpl.json'
+#)
 #------------------------------------------------------------------------
